@@ -1,17 +1,19 @@
 # Example NextJS App Frontend
 
+Small change
+
 This is a [Next.js](https://nextjs.org) project.
 
 ## Quick Reference
 
-| Task                   | Command                                      |
-| ---------------------- | -------------------------------------------- |
-| Install dependencies   | `pnpm install`                               |
-| Run development server | `pnpm dev`                                   |
-| Build for production   | `pnpm build`                                 |
-| Build with OpenNext    | `pnpm build:open`                            |
-| Lint code              | `pnpm lint`                                  |
-| Run tests              | `pnpm test`                                  |
+| Task                   | Command                                           |
+| ---------------------- | ------------------------------------------------- |
+| Install dependencies   | `pnpm install`                                    |
+| Run development server | `pnpm dev`                                        |
+| Build for production   | `pnpm build`                                      |
+| Build with OpenNext    | `pnpm build:open`                                 |
+| Lint code              | `pnpm lint`                                       |
+| Run tests              | `pnpm test`                                       |
 | Build Docker image     | `docker build -t example-nextjs-frontend .`       |
 | Run Docker container   | `docker run -p 3000:3000 example-nextjs-frontend` |
 
