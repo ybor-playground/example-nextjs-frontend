@@ -53,21 +53,20 @@ jobs:
       - name: Build and publish Docker image
         uses: p6m-actions/js-pnpm-docker-build-publish@v1
         with:
-          working-directory: front-end-apps
-          image-name: p6m/application
+          working-directory: .
+          image-name: example-nextjs-frontend
           registry: artifactory.example.com
           registry-username: ${{ github.actor }}
           registry-password: ${{ secrets.ARTIFACTORY_TOKEN }}
-          tags: |
-            latest
-            ${{ steps.get_version.outputs.VERSION || steps.cut_tag.outputs.version }}
+          version: ${{ steps.cut_tag.outputs.version }}
+          tag-latest: true
         if: success()
 
       # Dispatch platform application manifest
       - name: Dispatch platform application manifest
         uses: p6m-actions/platform-application-manifest-dispatch@v1
         with:
-          application-name: p6m-application
-          version: ${{ steps.get_version.outputs.VERSION || steps.cut_tag.outputs.version }}
+          application-name: example-nextjs-frontend
+          version: ${{ steps.cut_tag.outputs.version }}
           token: ${{ secrets.GITHUB_TOKEN }}
         if: success()
