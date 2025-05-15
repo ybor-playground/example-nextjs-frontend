@@ -1,4 +1,4 @@
-name: Cut Release Tag
+name: Manual Release (Cut Tag and Release)
 
 on:
   workflow_dispatch:
@@ -15,6 +15,12 @@ on:
 
 permissions:
   contents: write # Required for pushing tags
+  packages: write # Required for publishing
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  ARTIFACTORY_TOKEN: ${{ secrets.ARTIFACTORY_TOKEN }}
+  NODE_OPTIONS: --max_old_space_size=4096
 
 jobs:
   release:
@@ -25,15 +31,50 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Setup PNPM
       - name: Setup pnpm
         uses: p6m-actions/js-pnpm-setup@v1
         with:
           node-version: "20"
 
+      # Set up Docker Buildx
+      - name: Set up Docker Buildx
+        uses: p6m-actions/docker-buildx-setup@v1
+
+      # Build the application
+      - name: Build
+        uses: p6m-actions/js-pnpm-build@v1
+
+      # Cut Tag with user-specified version level
       - name: Cut Tag
+        id: cut_tag
         uses: p6m-actions/js-pnpm-cut-tag@v1
         with:
           version-level: ${{ github.event.inputs.version-level }}
 
+      # Output Version Info
       - name: Output Version Info
-        run: echo "Released version ${{ steps.cut-tag.outputs.version }} with tag ${{ steps.cut-tag.outputs.tag }}"
+        run: echo "Released version ${{ steps.cut_tag.outputs.version }} with tag ${{ steps.cut_tag.outputs.tag }}"
+
+      # Build and publish Docker image
+      - name: Build and publish Docker image
+        uses: p6m-actions/js-pnpm-docker-build-publish@v1
+        with:
+          working-directory: front-end-apps
+          image-name: p6m/application
+          registry: artifactory.example.com
+          registry-username: ${{ github.actor }}
+          registry-password: ${{ secrets.ARTIFACTORY_TOKEN }}
+          tags: |
+            latest
+            ${{ steps.cut_tag.outputs.version }}
+        if: success()
+
+      # Dispatch platform application manifest
+      - name: Dispatch platform application manifest
+        uses: p6m-actions/platform-application-manifest-dispatch@v1
+        with:
+          application-name: p6m-application
+          version: ${{ steps.cut_tag.outputs.version }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+        if: success()
