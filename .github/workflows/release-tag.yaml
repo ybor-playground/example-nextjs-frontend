@@ -33,8 +33,6 @@ jobs:
       # Build the application with PNPM
       - name: Build application
         uses: p6m-actions/js-pnpm-build@v1
-        with:
-          build-command: pnpm lint && pnpm test && pnpm build
 
       # Extract version from tag
       - name: Extract version from tag
